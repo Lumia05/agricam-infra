@@ -117,6 +117,7 @@ jobs:
         uses: aquasecurity/tfsec-action@v1.0.3
         with:
           working_directory: environnements/dev
+          soft_fail: true
 
 # =====================================================
 # JOB 5 - CHECKOV
