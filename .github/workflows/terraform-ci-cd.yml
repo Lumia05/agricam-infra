@@ -136,7 +136,7 @@ jobs:
         with:
           directory: environnements/dev
           framework: terraform
-          quiet: true
+          soft_fail: true
 
 # =====================================================
 # JOB 6 - TERRASCAN
