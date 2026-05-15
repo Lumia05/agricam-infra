@@ -1,0 +1,12 @@
+severity_overrides:
+  AWS017: ERROR
+  AWS018: ERROR
+  AWS019: ERROR
+  AWS020: ERROR
+
+soft_fail: false
+
+exclude:
+  - AWS077
+
+minimum_severity: MEDIUM
