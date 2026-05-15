@@ -133,6 +133,18 @@ resource "aws_instance" "agricam_serveur" {
   vpc_security_group_ids = [aws_security_group.agricam_sg.id]
   key_name               = aws_key_pair.agricam_keypair.key_name
 
+  # Correction tfsec #5 : Chiffrement du disque racine au repos
+  root_block_device {
+    encrypted = true
+  }
+
+  # Correction tfsec #4 : Protection contre les attaques SSRF (IMDSv2 obligatoire)
+  metadata_options {
+    http_endpoint               = "enabled"
+    http_tokens                 = "required"
+    http_put_response_hop_limit = 1
+  }
+
   # Script d'initialisation (optionnel)
   user_data = <<-EOF
         #!/bin/bash
@@ -160,6 +172,23 @@ resource "aws_s3_bucket" "agricam_stockage" {
   }
 }
 
+# Correction tfsec #6 & #7 : Activation du chiffrement automatique côté serveur
+resource "aws_s3_bucket_server_side_encryption_configuration" "agricam_s3_encrypt" {
+  bucket = aws_s3_bucket.agricam_stockage.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+# Correction tfsec #10 : Activation du versioning (protection contre les suppressions accidentelles)
+resource "aws_s3_bucket_versioning" "agricam_s3_versioning" {
+  bucket = aws_s3_bucket.agricam_stockage.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
 # Bloquer tout acces public au bucket
 resource "aws_s3_bucket_public_access_block" "agricam_s3_pab" {
   bucket = aws_s3_bucket.agricam_stockage.id
