@@ -1,0 +1,41 @@
+name: "Terraform CI"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  terraform-ci:
+    name: "Format, Init et Validate"
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Récupérer le code du dépôt
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 2. Installer Terraform dans l'environnement GitHub
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0 # Mets ici ta version de Terraform si besoin
+
+      # 3. Vérifier le formatage du code (strict)
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      # 4. Initialiser Terraform (téléchargement des providers)
+      - name: Terraform Init
+        run: terraform init
+        # Note : Si ton code est dans environnements/dev, remplace par :
+        # run: cd environnements/dev && terraform init
+
+      # 5. Valider la cohérence du code
+      - name: Terraform Validate
+        run: terraform validate
+        # Note : Même chose si tu es dans un sous-dossier :
+        # run: cd environnements/dev && terraform validate
