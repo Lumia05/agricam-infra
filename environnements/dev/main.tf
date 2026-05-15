@@ -10,13 +10,6 @@ terraform {
       version = "~> 5.0"
     }
   }
-
-  # Si tu as ton bloc backend S3, il vient aussi se placer ici :
-  # backend "s3" {
-  #   bucket         = "agricam-tfstate-storage"
-  #   key            = "dev/terraform.tfstate"
-  #   ...
-  # }
 }
 
 provider "aws" {
@@ -24,6 +17,7 @@ provider "aws" {
 }
 
 # VPC : Le reseau prive isole dans AWS
+# tfsec:ignore:aws-ec2-require-vpc-flow-logs-for-all-vpcs (Pas de Flow Logs requis en Dev)
 resource "aws_vpc" "agricam_vpc" {
   cidr_block           = "10.0.0.0/16"
   enable_dns_hostnames = true
@@ -38,6 +32,7 @@ resource "aws_vpc" "agricam_vpc" {
 }
 
 # Sous-reseau public
+# tfsec:ignore:aws-ec2-no-public-ip-subnet (Necessaire pour exposer l'instance de Dev)
 resource "aws_subnet" "agricam_subnet" {
   vpc_id                  = aws_vpc.agricam_vpc.id
   cidr_block              = "10.0.1.0/24"
@@ -88,7 +83,7 @@ resource "aws_security_group" "agricam_sg" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-ec2-no-public-ingress-sgr
     description = "Acces HTTP public"
   }
 
@@ -97,7 +92,7 @@ resource "aws_security_group" "agricam_sg" {
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-ec2-no-public-ingress-sgr
     description = "Acces HTTPS public"
   }
 
@@ -115,10 +110,14 @@ resource "aws_security_group" "agricam_sg" {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0"] #tfsec:ignore:aws-ec2-no-public-egress-sgr
+    description = "Autoriser tout le trafic sortant"
+  }
+
+  tags = {
+    Name = "agricam-sg-${var.environnement}"
   }
 }
-
 
 resource "aws_key_pair" "agricam_keypair" {
   key_name   = "agricam-keypair"
@@ -182,6 +181,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "agricam_s3_encryp
     }
   }
 }
+
 # Correction tfsec #10 : Activation du versioning (protection contre les suppressions accidentelles)
 resource "aws_s3_bucket_versioning" "agricam_s3_versioning" {
   bucket = aws_s3_bucket.agricam_stockage.id
@@ -189,6 +189,7 @@ resource "aws_s3_bucket_versioning" "agricam_s3_versioning" {
     status = "Enabled"
   }
 }
+
 # Bloquer tout acces public au bucket
 resource "aws_s3_bucket_public_access_block" "agricam_s3_pab" {
   bucket = aws_s3_bucket.agricam_stockage.id
