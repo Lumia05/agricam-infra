@@ -37,5 +37,14 @@ jobs:
       # 5. Valider la cohérence du code
       - name: Terraform Validate
         run: terraform validate
+      - name: Setup TFLint
+        uses: terraform-linters/setup-tflint@v4
+
+      - name: Init TFLint
+        run: tflint --init
+
+      - name: Run TFLint
+        run: tflint
+
         # Note : Même chose si tu es dans un sous-dossier :
         # run: cd environnements/dev && terraform validate
