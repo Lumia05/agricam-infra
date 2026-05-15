@@ -2,12 +2,21 @@
 # Infrastructure AgriCam — Environnement de developpement
 # CamTech Solutions — Douala, Cameroun
 terraform {
+  required_version = ">= 1.7.5" # <-- C'est cette ligne qu'il faut ajouter pour TFLint
+
   required_providers {
     aws = {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
   }
+
+  # Si tu as ton bloc backend S3, il vient aussi se placer ici :
+  # backend "s3" {
+  #   bucket         = "agricam-tfstate-storage"
+  #   key            = "dev/terraform.tfstate"
+  #   ...
+  # }
 }
 
 provider "aws" {
