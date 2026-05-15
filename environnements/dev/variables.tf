@@ -20,3 +20,7 @@ variable "ip_admin" {
   description = "IP de l'admin autorise au SSH (format x.x.x.x/32)"
   type        = string
 }
+variable "ssh_public_key" {
+  type        = string
+  description = "Contenu de la clé publique SSH pour l'instance"
+}

@@ -283,3 +283,23 @@ jobs:
 
       - name: Terraform Apply
         run: terraform apply -auto-approve
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Format Check
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: cd environnements/dev && terraform init
+
+      - name: Terraform Validate
+        run: cd environnements/dev && terraform validate
+        env:
+          TF_VAR_ssh_public_key: ${{ secrets.TF_VAR_SSH_PUBLIC_KEY }}

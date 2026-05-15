@@ -112,8 +112,8 @@ resource "aws_security_group" "agricam_sg" {
 
 
 resource "aws_key_pair" "agricam_keypair" {
-  key_name   = "agricam-keypair-${var.environnement}"
-  public_key = file("~/.ssh/agricam_key.pub")
+  key_name   = "agricam-keypair"
+  public_key = var.ssh_public_key
 }
 
 # Instance EC2 (serveur virtuel)
