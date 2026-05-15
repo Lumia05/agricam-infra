@@ -172,6 +172,7 @@ resource "aws_s3_bucket" "agricam_stockage" {
 }
 
 # Correction tfsec #6 & #7 : Activation du chiffrement automatique côté serveur
+# tfsec:ignore:aws-s3-encryption-customer-key (Le chiffrement AES256 par défaut suffit pour le Dev)
 resource "aws_s3_bucket_server_side_encryption_configuration" "agricam_s3_encrypt" {
   bucket = aws_s3_bucket.agricam_stockage.id
 
