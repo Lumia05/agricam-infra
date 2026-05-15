@@ -1,0 +1,15 @@
+quiet: true
+
+compact: true
+
+framework:
+  - terraform
+
+download_external_modules: true
+
+soft-fail: false
+
+evaluate-variables: true
+
+skip-check:
+  - CKV_AWS_79
