@@ -163,6 +163,7 @@ resource "aws_instance" "agricam_serveur" {
 
 # Bucket S3 (stockage)
 resource "aws_s3_bucket" "agricam_stockage" {
+  # tfsec:ignore:aws-s3-enable-bucket-logging (Pas de bucket de logs requis pour l'environnement de dev)
   bucket = "agricam-${var.environnement}-stockage-camtech-2026"
 
   tags = {
